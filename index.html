@@ -73,15 +73,12 @@
       'left': () => direction = 3
     }
     otherActions[action]()
-    return drawToDirectionWhile(direction, x, y)
-  }
-  const drawToDirectionWhile = (direction, x, y) => {
     drawTo(x, y)
     const directionMappings = {
-        0: () => {while (draw(x, --y)); },
-        1: () => {while (draw(++x, y));},
-        2: () => {while (draw(x, ++y));},
-        3: () => {while (draw(--x, y));}
+      0: () => {while (draw(x, --y)); },
+      1: () => {while (draw(++x, y));},
+      2: () => {while (draw(x, ++y));},
+      3: () => {while (draw(--x, y));}
     }
     directionMappings[direction]()
   }
