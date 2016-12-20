@@ -26,9 +26,8 @@
       for (let x = 0; x < width; x++) {
         const pixel = matrix[y][x]
         if (pixel === 'up' || pixel === 'left') {
-          direction = pixel === 'up' ? 0 : 3
           start(x, y)
-          drawToDirectionWhile(direction, x, y)
+          draw(x, y)
         }
       }
     }
@@ -79,10 +78,10 @@
   const drawToDirectionWhile = (direction, x, y) => {
     drawTo(x, y)
     const directionMappings = {
-        0: () => {while (draw(x, y - 1)) y--},
-        1: () => {while (draw(x + 1, y)) x++},
-        2: () => {while (draw(x, y + 1)) y++},
-        3: () => {while (draw(x - 1, y)) x--}
+        0: () => {while (draw(x, --y)); },
+        1: () => {while (draw(++x, y));},
+        2: () => {while (draw(x, ++y));},
+        3: () => {while (draw(--x, y));}
     }
     directionMappings[direction]()
   }
