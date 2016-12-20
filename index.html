@@ -3,19 +3,8 @@
 <head>
     <title>Puzzle</title>
     <meta charset="utf-8"/>
-    <style>
-        body { font: 8px Arial; }
-        ul { padding: 5px; }
-    </style>
 </head>
 <body>
-<ul>
-    <li>Ala piirtää ylöspäin, kun pikselin väri on 7, 84, 19.</li>
-    <li>Ala piirtää vasemmalle, kun pikselin väri on 139, 57, 137.</li>
-    <li>Lopeta viivan piirtäminen, kun pikselin väri on 51, 69, 169.</li>
-    <li>Käänny oikealle, kun pikselin väri on 182, 149, 72.</li>
-    <li>Käänny vasemmalle, kun pikselin väri on 123, 131, 154.</li>
-</ul>
 
 <canvas id="canvas" width="180" height="60"></canvas>
 <script>
@@ -24,25 +13,18 @@
   let matrix
   let ctx
   let direction //0 up, 1 right, 2 down, 3 left
-  const action = rgba => {
-    if (rgbEquals(rgba, [7, 84, 19])) {
-      return 'up'
-    } else if (rgbEquals(rgba, [139, 57, 137])) {
-      return 'left'
-    } else if (rgbEquals(rgba, [51, 69, 169])) {
-      return 'stop'
-    } else if (rgbEquals(rgba, [182, 149, 72])) {
-      return 'turnRight'
-    } else if (rgbEquals(rgba, [123, 131, 154])) {
-      return 'turnLeft'
-    } else {
-      return null
-    }
+  const rgbaToAction = rgba => {
+    if (rgbEquals(rgba, 7, 84, 19)) return 'up'
+    else if (rgbEquals(rgba, 139, 57, 137)) return 'left'
+    else if (rgbEquals(rgba, 51, 69, 169)) return 'stop'
+    else if (rgbEquals(rgba, 182, 149, 72)) return 'turnRight'
+    else if (rgbEquals(rgba, 123, 131, 154)) return 'turnLeft'
+    else return null
   }
-  const rgbEquals = (rgba, rgb) =>
-  rgba[0] == rgb[0] &&
-  rgba[1] == rgb[1] &&
-  rgba[2] == rgb[2]
+  const rgbEquals = (rgba, r, g, b) =>
+  rgba[0] === r &&
+  rgba[1] === g &&
+  rgba[2] === b
 
   const partition = (arr, chunk) => {
     const newArr = []
@@ -66,45 +48,45 @@
     return true
   }
 
+  const turnRight = () => direction = direction === 3 ? 0 : direction + 1
+  const turnLeft = () => direction = direction === 0 ? 3 : direction - 1
+
   const drawToDirectionWhile = (direction, x, y) => {
+    drawLineTo(x, y)
     switch (direction) {
-    case 0:
-      return upWhile(x, y)
-    case 1:
-      return rightWhile(x, y)
-    case 2:
-      return downWhile(x, y)
-    case 3:
-      return leftWhile(x, y)
+    case 0: return upWhile(x, y)
+    case 1: return rightWhile(x, y)
+    case 2: return downWhile(x, y)
+    case 3: return leftWhile(x, y)
     }
   }
 
   const drawAction = (x, y) => {
-    let pixel = matrix[y][x]
-    if (pixel === 'stop') {
+    switch (matrix[y][x]) {
+    case 'stop':
       return stopLine(x, y)
-    } else if (pixel === 'turnRight') {
+    case 'turnRight':
       turnRight()
       return drawToDirectionWhile(direction, x, y)
-    } else if (pixel === 'turnLeft') {
+    case 'turnLeft':
       turnLeft()
       return drawToDirectionWhile(direction, x, y)
-    } else {
+    default:
       return false
     }
   }
 
   const upWhile = (xStart, yStart) => {
-    drawLineTo(xStart, yStart)
     for (let y = yStart - 1; y > 0; y--) {
       const status = drawAction(xStart, y)
-      if (status) return true
+      if (status) {
+        return true
+      }
     }
     return true
   }
 
   const downWhile = (xStart, yStart) => {
-    drawLineTo(xStart, yStart)
     for (let y = yStart + 1; y < height; y++) {
       const status = drawAction(xStart, y)
       if (status) return true
@@ -112,7 +94,6 @@
     return true
   }
   const leftWhile = (xStart, yStart) => {
-    drawLineTo(xStart, yStart)
     for (let x = xStart - 1; x > 0; x--) {
       const status = drawAction(x, yStart)
       if (status) return true
@@ -121,7 +102,6 @@
   }
 
   const rightWhile = (xStart, yStart) => {
-    drawLineTo(xStart, yStart)
     for (let x = xStart + 1; x < width; x++) {
       const status = drawAction(x, yStart)
       if (status) return true
@@ -129,34 +109,22 @@
     return true
   }
 
-  const turnRight = () => direction = direction === 3 ? 0 : direction + 1
-  const turnLeft = () => direction = direction === 0 ? 3 : direction - 1
-
-  const myImg = new Image()
-  myImg.src = 'image.png'
-  myImg.onload = () => {
+  const image = new Image()
+  image.src = 'image.png'
+  image.onload = () => {
     ctx = document.getElementById('canvas').getContext('2d')
-    ctx.drawImage(myImg, 0, 0)
-    ctx.strokeStyle = "rgba(255, 0, 0, 1.0)"
-    ctx.lineWidth = 2
-    ctx.lineCap = "round"
-    const data = Array.from(ctx.getImageData(0, 0, width, height).data)
-    const pixels = partition(data, 4).map(action)
+    ctx.drawImage(image, 0, 0)
+    ctx.strokeStyle = "rgb(255, 0, 0)"
+    const pixels = partition(Array.from(ctx.getImageData(0, 0, width, height).data), 4).map(rgbaToAction)
+    ctx.fillRect(0,0,width,height);
     matrix = partition(pixels, width)
-    window.matrix = matrix
     for (let y = 0; y < height - 1; y++) {
       for (let x = 0; x < width - 1; x++) {
         const pixel = matrix[y][x]
-        if (pixel) {
-          if (pixel === 'up') {
-            penDown(x, y)
-            direction = 0
-            upWhile(x, y)
-          } else if (pixel === 'left') {
-            penDown(x, y)
-            direction = 2
-            downWhile(x, y)
-          }
+        if (pixel === 'up' || pixel === 'left') {
+          penDown(x, y)
+          direction = 'up' ? 0 : 2
+          drawToDirectionWhile(direction, x, y)
         }
       }
     }
