@@ -73,29 +73,27 @@
   }
 
   const upWhile = (x, y) => {
-    for (; y > 0; y--) {
+    for (; ; y--) {
       const status = drawAction(x, y)
-      if (status) {
-        return true
-      }
+      if (status) return true
     }
   }
 
   const downWhile = (x, y) => {
-    for (; y < height; y++) {
+    for (; ; y++) {
       const status = drawAction(x, y)
       if (status) return true
     }
   }
   const leftWhile = (x, y) => {
-    for (; x > 0; x--) {
+    for (; ; x--) {
       const status = drawAction(x, y)
       if (status) return true
     }
   }
 
   const rightWhile = (x, y) => {
-    for (; x < width; x++) {
+    for (; ; x++) {
       const status = drawAction(x, y)
       if (status) return true
     }
