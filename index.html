@@ -16,9 +16,8 @@
   const rgbaToAction = rgba => {
     if (rgbEquals(rgba, 7, 84, 19)) return 'up'
     else if (rgbEquals(rgba, 139, 57, 137)) return 'left'
-    else if (rgbEquals(rgba, 51, 69, 169)) {
-      return 'stop'
-    } else if (rgbEquals(rgba, 182, 149, 72)) {
+    else if (rgbEquals(rgba, 51, 69, 169)) return 'stop'
+    else if (rgbEquals(rgba, 182, 149, 72)) {
       return 'turnRight'
     } else if (rgbEquals(rgba, 123, 131, 154)) {
       return 'turnLeft'
@@ -53,25 +52,23 @@
     return true
   }
 
-  const turnRight = () => direction = direction === 3 ? 0 : direction + 1
-  const turnLeft = () => direction = direction === 0 ? 3 : direction - 1
-
   const drawAction = (x, y) => {
     const pixel = matrix[y][x]
     if (!pixel) return false
     if (pixel == 'stop') return stopLine(x, y)
     switch (pixel) {
     case 'turnRight':
-      turnRight()
+      direction = direction === 3 ? 0 : direction + 1
       break
     case 'turnLeft':
-      turnLeft()
+      direction = direction === 0 ? 3 : direction - 1
       break
     case 'up':
       direction = 0
       break
     case 'left':
       direction = 3
+      break
     }
     return drawToDirectionWhile(direction, x, y)
   }
@@ -81,17 +78,18 @@
     switch (direction) {
     case 0:
       while (!drawAction(x, y - 1)) y--
-      return true
+      break
     case 1:
       while (!drawAction(x + 1, y)) x++
-      return true
+      break
     case 2:
       while (!drawAction(x, y + 1)) y++
-      return true
+      break
     case 3:
       while (!drawAction(x - 1, y)) x--
-      return true
+      break
     }
+    return true
   }
 
   const image = new Image()
