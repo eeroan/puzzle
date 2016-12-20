@@ -3,24 +3,31 @@
 <head>
     <title>Puzzle</title>
     <meta charset="utf-8"/>
+    <style>
+        body { font: 8px Arial; }
+        ul { padding: 5px; }
+    </style>
 </head>
 <body>
-<pre>
-Ala piirtää ylöspäin, kun pikselin väri on 7, 84, 19.
-Ala piirtää vasemmalle, kun pikselin väri on 139, 57, 137.
-Lopeta viivan piirtäminen, kun pikselin väri on 51, 69, 169.
-Käänny oikealle, kun pikselin väri on 182, 149, 72.
-Käänny vasemmalle, kun pikselin väri on 123, 131, 154.
-</pre>
+<ul>
+    <li>Ala piirtää ylöspäin, kun pikselin väri on 7, 84, 19.</li>
+    <li>Ala piirtää vasemmalle, kun pikselin väri on 139, 57, 137.</li>
+    <li>Lopeta viivan piirtäminen, kun pikselin väri on 51, 69, 169.</li>
+    <li>Käänny oikealle, kun pikselin väri on 182, 149, 72.</li>
+    <li>Käänny vasemmalle, kun pikselin väri on 123, 131, 154.</li>
+</ul>
+
 <canvas id="canvas" width="180" height="60"></canvas>
 <script>
   const width = 180
   const height = 60
   let matrix
   let ctx
+  let direction //0 up, 1 right, 2 down, 3 left
   const action = rgba => {
-    if (rgbEquals(rgba, [7, 84, 19])) return 'up'
-    else if (rgbEquals(rgba, [139, 57, 137])) {
+    if (rgbEquals(rgba, [7, 84, 19])) {
+      return 'up'
+    } else if (rgbEquals(rgba, [139, 57, 137])) {
       return 'left'
     } else if (rgbEquals(rgba, [51, 69, 169])) {
       return 'stop'
@@ -59,12 +66,30 @@ Käänny vasemmalle, kun pikselin väri on 123, 131, 154.
   }
 
   const upWhile = (xStart, yStart) => {
+    direction = 0
     drawLineTo(xStart, yStart)
     for (let y = yStart; y > 0; y--) {
       let pixel = matrix[y][xStart]
-      if (pixel === 'stop' || y === 0) return stopLine(xStart, y)
+      if (pixel === 'stop' || y === 0) {
+        return stopLine(xStart, y)
+      }
     }
   }
+
+  const downWhile = (xStart, yStart) => {
+    direction = 2
+    drawLineTo(xStart, yStart)
+    for (let y = yStart; y < height; y++) {
+      let pixel = matrix[y][xStart]
+      if (pixel === 'stop' || y === 0) {
+        return stopLine(xStart, y)
+      }
+    }
+  }
+
+
+  const turnRight = () => direction = direction === 3 ? 0 : direction + 1
+  const turnLeft = () => direction = direction === 0 ? 3 : direction - 1
 
   const myImg = new Image()
   myImg.src = 'image.png'
@@ -83,13 +108,16 @@ Käänny vasemmalle, kun pikselin väri on 123, 131, 154.
     const pixels = partition(data, 4).map(action)
     matrix = partition(pixels, width)
     window.matrix = matrix
-    for (let y = 0; y < height-1; y++) {
-      for (let x = 0; x < width-1; x++) {
+    for (let y = 0; y < height - 1; y++) {
+      for (let x = 0; x < width - 1; x++) {
         const pixel = matrix[y][x]
         if (pixel) {
           if (pixel === 'up') {
             penDown(x, y)
             upWhile(x, y)
+          } else if(pixel === 'left') {
+            penDown(x, y)
+            downWhile(x, y)
           }
         }
       }
