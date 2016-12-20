@@ -65,28 +65,83 @@
     ctx.closePath()
   }
 
+  const drawToDirectionWhile = (direction, x, y) => {
+    switch(direction) {
+    case 0: return upWhile(x, y)
+    case 1: return rightWhile(x,y)
+    case 2: return downWhile(x,y)
+    case 3: return leftWhile(x,y)
+    }
+  }
+
+
   const upWhile = (xStart, yStart) => {
     direction = 0
-    drawLineTo(xStart, yStart)
-    for (let y = yStart; y > 0; y--) {
-      let pixel = matrix[y][xStart]
+    const x = xStart
+    drawLineTo(x, yStart)
+    for (let y = yStart-1; y > 0; y--) {
+      let pixel = matrix[y][x]
       if (pixel === 'stop' || y === 0) {
-        return stopLine(xStart, y)
+        return stopLine(x, y)
+      } else if(pixel === 'turnRight') {
+        turnRight()
+        return drawToDirectionWhile(direction, x, y)
+      } else if(pixel === 'turnLeft') {
+        turnLeft()
+        return drawToDirectionWhile(direction, x, y)
       }
     }
   }
 
   const downWhile = (xStart, yStart) => {
-    direction = 2
-    drawLineTo(xStart, yStart)
-    for (let y = yStart; y < height; y++) {
-      let pixel = matrix[y][xStart]
+    const x = xStart
+    drawLineTo(x, yStart)
+    for (let y = yStart+1; y < height; y++) {
+      let pixel = matrix[y][x]
       if (pixel === 'stop' || y === 0) {
-        return stopLine(xStart, y)
+        return stopLine(x, y)
+      } else if(pixel === 'turnRight') {
+        turnRight()
+        return drawToDirectionWhile(direction, x, y)
+      } else if(pixel === 'turnLeft') {
+        turnLeft()
+        return drawToDirectionWhile(direction, x, y)
       }
     }
   }
-
+  const leftWhile = (xStart, yStart) => {
+    drawLineTo(xStart, yStart)
+    const y = yStart
+    for (let x = xStart-1; x > 0; x--) {
+      let pixel = matrix[y][x]
+      if (pixel === 'stop' || y === 0) {
+        return stopLine(x, y)
+      } else if(pixel === 'turnRight') {
+        turnRight()
+        console.log('turn')
+        return drawToDirectionWhile(direction, x, y)
+      } else if(pixel === 'turnLeft') {
+        turnLeft()
+        return drawToDirectionWhile(direction, x, y)
+      }
+    }
+  }
+  const rightWhile = (xStart, yStart) => {
+    drawLineTo(xStart, yStart)
+    const y = yStart
+    for (let x = xStart+1; x < width; x++) {
+      let pixel = matrix[y][x]
+      if (pixel === 'stop' || y === 0) {
+        return stopLine(x, y)
+      } else if(pixel === 'turnRight') {
+        turnRight()
+        return drawToDirectionWhile(direction, x, y)
+      } else if(pixel === 'turnLeft') {
+        turnLeft()
+        return drawToDirectionWhile(direction, x, y)
+      }
+    }
+  }
 
   const turnRight = () => direction = direction === 3 ? 0 : direction + 1
   const turnLeft = () => direction = direction === 0 ? 3 : direction - 1
@@ -98,9 +153,8 @@
     with (ctx) {
       drawImage(myImg, 0, 0)
       strokeStyle = "rgba(255, 0, 0, 1.0)"
-      lineWidth = 1
+      lineWidth = 2
       lineCap = "round"
-
     }
 
     const data = Array.from(ctx.getImageData(0, 0, width, height).data)
@@ -114,9 +168,11 @@
         if (pixel) {
           if (pixel === 'up') {
             penDown(x, y)
+            direction = 0
             upWhile(x, y)
           } else if(pixel === 'left') {
             penDown(x, y)
+            direction = 2
             downWhile(x, y)
           }
         }
