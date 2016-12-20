@@ -17,10 +17,13 @@
     if (rgbEquals(rgba, 7, 84, 19)) return 'up'
     else if (rgbEquals(rgba, 139, 57, 137)) return 'left'
     else if (rgbEquals(rgba, 51, 69, 169)) return 'stop'
-    else if (rgbEquals(rgba, 182, 149, 72)) return 'turnRight'
-    else if (rgbEquals(rgba, 123, 131, 154)) {
+    else if (rgbEquals(rgba, 182, 149, 72)) {
+      return 'turnRight'
+    } else if (rgbEquals(rgba, 123, 131, 154)) {
       return 'turnLeft'
-    } else return null
+    } else {
+      return null
+    }
   }
   const rgbEquals = (rgba, r, g, b) =>
   rgba[0] === r &&
@@ -73,43 +76,35 @@
   }
 
   const upWhile = (x, y) => {
-    for (; ; y--) {
-      const status = drawAction(x, y)
-      if (status) return true
-    }
+    while (!drawAction(x, y)) y--
+    return true
   }
 
   const downWhile = (x, y) => {
-    for (; ; y++) {
-      const status = drawAction(x, y)
-      if (status) return true
-    }
+    while (!drawAction(x, y)) y++
+    return true
   }
   const leftWhile = (x, y) => {
-    for (; ; x--) {
-      const status = drawAction(x, y)
-      if (status) return true
-    }
+    while (!drawAction(x, y)) x--
+    return true
   }
 
   const rightWhile = (x, y) => {
-    for (; ; x++) {
-      const status = drawAction(x, y)
-      if (status) return true
-    }
+    while (!drawAction(x, y)) x++
+    return true
   }
 
   const drawToDirectionWhile = (direction, x, y) => {
     drawLineTo(x, y)
     switch (direction) {
     case 0:
-      return upWhile(x, y-1)
+      return upWhile(x, y - 1)
     case 1:
-      return rightWhile(x+1, y)
+      return rightWhile(x + 1, y)
     case 2:
-      return downWhile(x, y+1)
+      return downWhile(x, y + 1)
     case 3:
-      return leftWhile(x-1, y)
+      return leftWhile(x - 1, y)
     }
   }
 
