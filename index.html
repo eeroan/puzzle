@@ -64,21 +64,22 @@
   }
   const draw = (x, y) => {
     const action = matrix[y][x]
-    if (!action) return true
+    //if (!action) return true
     if (action == 'stop') return stop(x, y)
     const otherActions = {
       'turnRight': () => direction = direction === 3 ? 0 : direction + 1,
       'turnLeft': () => direction = direction === 0 ? 3 : direction - 1,
       'up': () => direction = 0,
-      'left': () => direction = 3
+      'left': () => direction = 3,
+      undefined: () => {}
     }
     otherActions[action]()
     drawTo(x, y)
     const directionMappings = {
-      0: () => {while (draw(x, --y)); },
-      1: () => {while (draw(++x, y));},
-      2: () => {while (draw(x, ++y));},
-      3: () => {while (draw(--x, y));}
+      0: () => draw(x, --y),
+      1: () => draw(++x, y),
+      2: () => draw(x, ++y),
+      3: () => draw(--x, y)
     }
     directionMappings[direction]()
   }
