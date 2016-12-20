@@ -51,8 +51,8 @@
   }
   const getDirection = (direction, action) => {
     const otherActions = {
-      'turnRight': () => direction === 3 ? 0 : direction + 1,
-      'turnLeft': () => direction === 0 ? 3 : direction - 1,
+      'turnRight': () => (direction + 1) % 4,
+      'turnLeft': () => (direction + 3 ) % 4,
       'up': () => 0,
       'left': () => 3
     }
