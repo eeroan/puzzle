@@ -62,18 +62,24 @@
   }
 
   const drawAction = (x, y) => {
-    switch (matrix[y][x]) {
-    case 'stop':
-      return stopLine(x, y)
+    const pixel = matrix[y][x]
+    if(!pixel) return false
+    if(pixel == 'stop') return stopLine(x, y)
+    switch (pixel) {
     case 'turnRight':
       turnRight()
-      return drawToDirectionWhile(direction, x, y)
+      break
     case 'turnLeft':
       turnLeft()
-      return drawToDirectionWhile(direction, x, y)
-    default:
-      return false
+      break
+    case 'up':
+      direction = 0
+      break
+    case 'left':
+      direction = 3
+      break
     }
+    return drawToDirectionWhile(direction, x, y)
   }
 
   const upWhile = (xStart, yStart) => {
@@ -123,7 +129,7 @@
         const pixel = matrix[y][x]
         if (pixel === 'up' || pixel === 'left') {
           penDown(x, y)
-          direction = 'up' ? 0 : 2
+          direction = 'up' ? 0 : 3
           drawToDirectionWhile(direction, x, y)
         }
       }
