@@ -11,8 +11,7 @@
   const image = new Image()
   image.src = 'image.png'
   image.onload = () => {
-    const width = image.naturalWidth
-    const height = image.naturalHeight
+    const { width, height } = image
     const ctx = canvas.getContext('2d')
     ctx.drawImage(image, 0, 0)
     ctx.strokeStyle = '#f00'
