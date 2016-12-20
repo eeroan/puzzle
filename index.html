@@ -5,21 +5,21 @@
     <meta charset="utf-8"/>
 </head>
 <body>
-<canvas id="canvas" width="180" height="60"></canvas>
 <script>
-  const width = 180
-  const height = 60
-  let direction
+  const canvas = document.createElement('canvas')
+  document.body.appendChild(canvas)
   const image = new Image()
   image.src = 'image.png'
   image.onload = () => {
-    const ctx = document.getElementById('canvas').getContext('2d')
+    const width = image.naturalWidth
+    const height = image.naturalHeight
+    const ctx = canvas.getContext('2d')
     ctx.drawImage(image, 0, 0)
     ctx.strokeStyle = '#f00'
     ctx.lineWidth = 2
     const pixels = partition(ctx.getImageData(0, 0, width, height).data, 4).map(rgbaToAction)
-    ctx.fillRect(0, 0, width, height);
     const matrix = partition(pixels, width)
+    ctx.fillRect(0, 0, width, height);
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const pixel = matrix[y][x]
@@ -49,28 +49,31 @@
     }
     return partitioned
   }
-  const draw = (ctx, matrix, x, y) => {
+  const getDirection = (direction, action) => {
+    const otherActions = {
+      'turnRight': () => direction === 3 ? 0 : direction + 1,
+      'turnLeft': () => direction === 0 ? 3 : direction - 1,
+      'up': () => 0,
+      'left': () => 3
+    }
+    return action ? otherActions[action]() : direction
+  }
+  const draw = (ctx, matrix, x, y, oldDirection) => {
     ctx.lineTo(x, y)
     ctx.stroke()
     const action = matrix[y][x]
     if (action === 'stop') {
       return ctx.closePath()
     }
-    const otherActions = {
-      'turnRight': () => direction = direction === 3 ? 0 : direction + 1,
-      'turnLeft': () => direction = direction === 0 ? 3 : direction - 1,
-      'up': () => direction = 0,
-      'left': () => direction = 3
-    }
-    action in otherActions && otherActions[action]()
     const updatePosition = {
       0: () => y--,
       1: () => x++,
       2: () => y++,
       3: () => x--
     }
-    updatePosition[direction]()
-    draw(ctx, matrix, x, y)
+    let newDirection = getDirection(oldDirection, action)
+    updatePosition[newDirection]()
+    draw(ctx, matrix, x, y, newDirection)
   }
 </script>
 </body>
