@@ -5,74 +5,13 @@
     <meta charset="utf-8"/>
 </head>
 <body>
-
 <canvas id="canvas" width="180" height="60"></canvas>
 <script>
   const width = 180
   const height = 60
   let matrix
   let ctx
-  let direction  //0 up, 1 right, 2 down, 3 left
-  const rgbaToAction = rgba => {
-    const rgbaStr = rgba.slice(0,3).join('-')
-    const colorsToActions = {
-      '7-84-19': 'up',
-      '139-57-137': 'left',
-      '51-69-169': 'stop',
-      '182-149-72': 'turnRight',
-      '123-131-154': 'turnLeft'
-    }
-    return colorsToActions[rgbaStr]
-  }
-
-  const partition = (arr, chunk) => {
-    const newArr = []
-    for (let i = 0, j = arr.length; i < j; i += chunk) {
-      newArr.push(arr.slice(i, i + chunk))
-    }
-    return newArr
-  }
-
-  const penDown = (x, y) => {
-    ctx.beginPath()
-    ctx.moveTo(x, y)
-  }
-  const drawLineTo = (x, y) => {
-    ctx.lineTo(x, y)
-    ctx.stroke()
-  }
-  const stopLine = (x, y) => {
-    drawLineTo(x, y)
-    ctx.closePath()
-    return true
-  }
-
-  const drawAction = (x, y) => {
-    const action = matrix[y][x]
-    if (!action) return false
-    if (action == 'stop') return stopLine(x, y)
-    const otherActions = {
-      'turnRight': () => direction = direction === 3 ? 0 : direction + 1,
-      'turnLeft': () => direction = direction === 0 ? 3 : direction - 1,
-      'up': () => direction = 0,
-      'left': () => direction = 3
-    }
-    otherActions[action]()
-    return drawToDirectionWhile(direction, x, y)
-  }
-
-  const drawToDirectionWhile = (direction, x, y) => {
-    drawLineTo(x, y)
-    const mapping = {
-        0: () => {while (!drawAction(x, y - 1)) y--},
-        1: () => {while (!drawAction(x + 1, y)) x++},
-        2: () => {while (!drawAction(x, y + 1)) y++},
-        3: () => {while (!drawAction(x - 1, y)) x--}
-    }
-    mapping[direction]()
-    return true
-  }
-
+  let direction
   const image = new Image()
   image.src = 'image.png'
   image.onload = () => {
@@ -87,12 +26,65 @@
       for (let x = 0; x < width; x++) {
         const pixel = matrix[y][x]
         if (pixel === 'up' || pixel === 'left') {
-          penDown(x, y)
           direction = pixel === 'up' ? 0 : 3
+          start(x, y)
           drawToDirectionWhile(direction, x, y)
         }
       }
     }
+  }
+  const rgbaToAction = rgba => {
+    const rgbaStr = rgba.slice(0,3).join('-')
+    const colorsToActions = {
+      '7-84-19': 'up',
+      '139-57-137': 'left',
+      '51-69-169': 'stop',
+      '182-149-72': 'turnRight',
+      '123-131-154': 'turnLeft'
+    }
+    return colorsToActions[rgbaStr]
+  }
+  const partition = (arr, chunk) => {
+    const partitioned = []
+    for (let i = 0, j = arr.length; i < j; i += chunk) {
+      partitioned.push(arr.slice(i, i + chunk))
+    }
+    return partitioned
+  }
+  const start = (x, y) => {
+    ctx.beginPath()
+    ctx.moveTo(x, y)
+  }
+  const drawTo = (x, y) => {
+    ctx.lineTo(x, y)
+    ctx.stroke()
+  }
+  const stop = (x, y) => {
+    drawTo(x, y)
+    ctx.closePath()
+  }
+  const draw = (x, y) => {
+    const action = matrix[y][x]
+    if (!action) return true
+    if (action == 'stop') return stop(x, y)
+    const otherActions = {
+      'turnRight': () => direction = direction === 3 ? 0 : direction + 1,
+      'turnLeft': () => direction = direction === 0 ? 3 : direction - 1,
+      'up': () => direction = 0,
+      'left': () => direction = 3
+    }
+    otherActions[action]()
+    return drawToDirectionWhile(direction, x, y)
+  }
+  const drawToDirectionWhile = (direction, x, y) => {
+    drawTo(x, y)
+    const directionMappings = {
+        0: () => {while (draw(x, y - 1)) y--},
+        1: () => {while (draw(x + 1, y)) x++},
+        2: () => {while (draw(x, y + 1)) y++},
+        3: () => {while (draw(x - 1, y)) x--}
+    }
+    directionMappings[direction]()
   }
 </script>
 </body>
