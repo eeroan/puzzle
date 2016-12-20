@@ -41,13 +41,7 @@
     }
     return colorsToActions[rgbaStr]
   }
-  const partition = (arr, chunk) => {
-    const partitioned = []
-    for (let i = 0, j = arr.length; i < j; i += chunk) {
-      partitioned.push(arr.slice(i, i + chunk))
-    }
-    return partitioned
-  }
+  const partition = (arr, chunk) => Array.from(Array(arr.length / chunk)).map((item, i) => arr.slice(i * chunk, (i+1) * chunk))
   const getDirection = (direction, action) => {
     const otherActions = {
       'turnRight': () => (direction + 1) % 4,
