@@ -9,12 +9,11 @@
 <script>
   const width = 180
   const height = 60
-  let ctx
   let direction
   const image = new Image()
   image.src = 'image.png'
   image.onload = () => {
-    ctx = document.getElementById('canvas').getContext('2d')
+    const ctx = document.getElementById('canvas').getContext('2d')
     ctx.drawImage(image, 0, 0)
     ctx.strokeStyle = '#f00'
     ctx.lineWidth = 2
@@ -27,7 +26,7 @@
         if (pixel === 'up' || pixel === 'left') {
           ctx.beginPath()
           ctx.moveTo(x, y)
-          draw(matrix, x, y)
+          draw(ctx, matrix, x, y)
         }
       }
     }
@@ -50,7 +49,7 @@
     }
     return partitioned
   }
-  const draw = (matrix, x, y) => {
+  const draw = (ctx, matrix, x, y) => {
     ctx.lineTo(x, y)
     ctx.stroke()
     const action = matrix[y][x]
@@ -71,7 +70,7 @@
       3: () => x--
     }
     updatePosition[direction]()
-    draw(matrix, x, y)
+    draw(ctx, matrix, x, y)
   }
 </script>
 </body>
