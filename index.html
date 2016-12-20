@@ -17,9 +17,9 @@
   image.onload = () => {
     ctx = document.getElementById('canvas').getContext('2d')
     ctx.drawImage(image, 0, 0)
-    ctx.strokeStyle = "rgb(255, 0, 0)"
+    ctx.strokeStyle = '#f00'
     ctx.lineWidth = 2
-    const pixels = partition(Array.from(ctx.getImageData(0, 0, width, height).data), 4).map(rgbaToAction)
+    const pixels = partition(ctx.getImageData(0, 0, width, height).data, 4).map(rgbaToAction)
     ctx.fillRect(0, 0, width, height);
     matrix = partition(pixels, width)
     for (let y = 0; y < height; y++) {
