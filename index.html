@@ -26,14 +26,15 @@
       for (let x = 0; x < width; x++) {
         const pixel = matrix[y][x]
         if (pixel === 'up' || pixel === 'left') {
-          start(x, y)
+          ctx.beginPath()
+          ctx.moveTo(x, y)
           draw(x, y)
         }
       }
     }
   }
   const rgbaToAction = rgba => {
-    const rgbaStr = rgba.slice(0,3).join('-')
+    const rgbaStr = rgba.slice(0, 3).join('-')
     const colorsToActions = {
       '7-84-19': 'up',
       '139-57-137': 'left',
@@ -50,38 +51,28 @@
     }
     return partitioned
   }
-  const start = (x, y) => {
-    ctx.beginPath()
-    ctx.moveTo(x, y)
-  }
-  const drawTo = (x, y) => {
+  const draw = (x, y) => {
     ctx.lineTo(x, y)
     ctx.stroke()
-  }
-  const stop = (x, y) => {
-    drawTo(x, y)
-    ctx.closePath()
-  }
-  const draw = (x, y) => {
     const action = matrix[y][x]
-    //if (!action) return true
-    if (action == 'stop') return stop(x, y)
+    if (action === 'stop') {
+      return ctx.closePath()
+    }
     const otherActions = {
       'turnRight': () => direction = direction === 3 ? 0 : direction + 1,
       'turnLeft': () => direction = direction === 0 ? 3 : direction - 1,
       'up': () => direction = 0,
-      'left': () => direction = 3,
-      undefined: () => {}
+      'left': () => direction = 3
     }
-    otherActions[action]()
-    drawTo(x, y)
-    const directionMappings = {
-      0: () => draw(x, --y),
-      1: () => draw(++x, y),
-      2: () => draw(x, ++y),
-      3: () => draw(--x, y)
+    action in otherActions && otherActions[action]()
+    const updatePosition = {
+      0: () => y--,
+      1: () => x++,
+      2: () => y++,
+      3: () => x--
     }
-    directionMappings[direction]()
+    updatePosition[direction]()
+    draw(x, y)
   }
 </script>
 </body>
