@@ -14,21 +14,16 @@
   let ctx
   let direction  //0 up, 1 right, 2 down, 3 left
   const rgbaToAction = rgba => {
-    if (rgbEquals(rgba, 7, 84, 19)) return 'up'
-    else if (rgbEquals(rgba, 139, 57, 137)) return 'left'
-    else if (rgbEquals(rgba, 51, 69, 169)) return 'stop'
-    else if (rgbEquals(rgba, 182, 149, 72)) {
-      return 'turnRight'
-    } else if (rgbEquals(rgba, 123, 131, 154)) {
-      return 'turnLeft'
-    } else {
-      return null
+    const rgbaStr = rgba.slice(0,3).join('-')
+    const colorsToActions = {
+      '7-84-19': 'up',
+      '139-57-137': 'left',
+      '51-69-169': 'stop',
+      '182-149-72': 'turnRight',
+      '123-131-154': 'turnLeft'
     }
+    return colorsToActions[rgbaStr]
   }
-  const rgbEquals = (rgba, r, g, b) =>
-  rgba[0] === r &&
-  rgba[1] === g &&
-  rgba[2] === b
 
   const partition = (arr, chunk) => {
     const newArr = []
@@ -53,42 +48,28 @@
   }
 
   const drawAction = (x, y) => {
-    const pixel = matrix[y][x]
-    if (!pixel) return false
-    if (pixel == 'stop') return stopLine(x, y)
-    switch (pixel) {
-    case 'turnRight':
-      direction = direction === 3 ? 0 : direction + 1
-      break
-    case 'turnLeft':
-      direction = direction === 0 ? 3 : direction - 1
-      break
-    case 'up':
-      direction = 0
-      break
-    case 'left':
-      direction = 3
-      break
+    const action = matrix[y][x]
+    if (!action) return false
+    if (action == 'stop') return stopLine(x, y)
+    const otherActions = {
+      'turnRight': () => direction = direction === 3 ? 0 : direction + 1,
+      'turnLeft': () => direction = direction === 0 ? 3 : direction - 1,
+      'up': () => direction = 0,
+      'left': () => direction = 3
     }
+    otherActions[action]()
     return drawToDirectionWhile(direction, x, y)
   }
 
   const drawToDirectionWhile = (direction, x, y) => {
     drawLineTo(x, y)
-    switch (direction) {
-    case 0:
-      while (!drawAction(x, y - 1)) y--
-      break
-    case 1:
-      while (!drawAction(x + 1, y)) x++
-      break
-    case 2:
-      while (!drawAction(x, y + 1)) y++
-      break
-    case 3:
-      while (!drawAction(x - 1, y)) x--
-      break
+    const mapping = {
+        0: () => {while (!drawAction(x, y - 1)) y--},
+        1: () => {while (!drawAction(x + 1, y)) x++},
+        2: () => {while (!drawAction(x, y + 1)) y++},
+        3: () => {while (!drawAction(x - 1, y)) x--}
     }
+    mapping[direction]()
     return true
   }
 
