@@ -1,12 +1,10 @@
 <body>
 <script>
-  const canvas = document.createElement('canvas')
-  document.body.appendChild(canvas)
   const image = new Image()
   image.src = 'image.png'
   image.onload = () => {
     const { width, height } = image
-    const ctx = canvas.getContext('2d')
+    const ctx = getContext()
     ctx.drawImage(image, 0, 0)
     ctx.strokeStyle = '#f00'
     ctx.lineWidth = 2
@@ -23,6 +21,11 @@
         }
       }
     }
+  }
+  const getContext = () => {
+    const canvas = document.createElement('canvas')
+    document.body.appendChild(canvas)
+    return canvas.getContext('2d')
   }
   const rgbaToAction = rgba => ({
     '7,84,19,255': 'up',
