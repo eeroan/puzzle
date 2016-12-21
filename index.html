@@ -25,48 +25,41 @@
         if (pixel === 'up' || pixel === 'left') {
           ctx.beginPath()
           ctx.moveTo(x, y)
-          draw(ctx, matrix, x, y)
+          draw(ctx, matrix, { x, y })
         }
       }
     }
   }
-  const rgbaToAction = rgba => {
-    const rgbaStr = rgba.slice(0, 3).join('-')
-    const colorsToActions = {
-      '7-84-19': 'up',
-      '139-57-137': 'left',
-      '51-69-169': 'stop',
-      '182-149-72': 'turnRight',
-      '123-131-154': 'turnLeft'
-    }
-    return colorsToActions[rgbaStr]
-  }
-  const partition = (arr, chunk) => Array.from(Array(arr.length / chunk)).map((item, i) => arr.slice(i * chunk, (i+1) * chunk))
-  const getDirection = (direction, action) => {
-    const otherActions = {
-      'turnRight': () => (direction + 1) % 4,
-      'turnLeft': () => (direction + 3 ) % 4,
-      'up': () => 0,
-      'left': () => 3
-    }
-    return action ? otherActions[action]() : direction
-  }
-  const draw = (ctx, matrix, x, y, oldDirection) => {
+  const rgbaToAction = rgba => ({
+    '7,84,19,255': 'up',
+    '139,57,137,255': 'left',
+    '51,69,169,255': 'stop',
+    '182,149,72,255': 'turnRight',
+    '123,131,154,255': 'turnLeft'
+  }[rgba.join(',')])
+  const partition = (arr, chunk) => Array.from(Array(arr.length / chunk)).map((item, i) => arr.slice(i * chunk, (i + 1) * chunk))
+  const getDirection = (direction, action) => action ? {
+      'turnRight': (direction + 1) % 4,
+      'turnLeft': (direction + 3 ) % 4,
+      'up': 0,
+      'left': 3
+    }[action] : direction
+  const nextPosition = ({ x, y }, direction) => ({
+    0: { x, y: y - 1 },
+    1: { x: x + 1, y },
+    2: { x, y: y + 1 },
+    3: { x: x - 1, y }
+  }[direction])
+  const draw = (ctx, matrix, { x, y }, oldDirection) => {
     ctx.lineTo(x, y)
     ctx.stroke()
     const action = matrix[y][x]
     if (action === 'stop') {
-      return ctx.closePath()
+      ctx.closePath()
+    } else {
+      let newDirection = getDirection(oldDirection, action)
+      draw(ctx, matrix, nextPosition({ x, y }, newDirection), newDirection)
     }
-    const updatePosition = {
-      0: () => y--,
-      1: () => x++,
-      2: () => y++,
-      3: () => x--
-    }
-    let newDirection = getDirection(oldDirection, action)
-    updatePosition[newDirection]()
-    draw(ctx, matrix, x, y, newDirection)
   }
 </script>
 </body>
