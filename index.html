@@ -15,7 +15,7 @@
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const pixel = matrix[y][x]
-          if (pixel === 'up' || pixel === 'left') {
+          if (pixel.startsWith('move')) {
             ctx.beginPath()
             ctx.moveTo(x, y)
             draw(ctx, matrix, { x, y })
@@ -30,18 +30,18 @@
     return canvas.getContext('2d')
   }
   const rgbaToAction = rgba => ({
-    '7,84,19,255': 'up',
-    '139,57,137,255': 'left',
+    '7,84,19,255': 'moveUp',
+    '139,57,137,255': 'moveLeft',
     '51,69,169,255': 'stop',
     '182,149,72,255': 'turnRight',
     '123,131,154,255': 'turnLeft'
-  }[rgba.join(',')])
+  }[rgba.join(',')] || '')
   const partition = (arr, chunk) => Array.from(Array(arr.length / chunk)).map((item, i) => arr.slice(i * chunk, (i + 1) * chunk))
   const getDirection = (direction, action) => action ? {
       'turnRight': (direction + 1) % 4,
       'turnLeft': (direction + 3 ) % 4,
-      'up': 0,
-      'left': 3
+      'moveUp': 0,
+      'moveLeft': 3
     }[action] : direction
   const nextPosition = ({ x, y }, direction) => ({
     0: { x, y: y - 1 },
