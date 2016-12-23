@@ -12,7 +12,7 @@
       ctx.fillRect(0, 0, width, height)
       for (let y = 0; y < height; y++)
         for (let x = 0; x < width; x++)
-          if (matrix[y][x].startsWith('move')) startDrawing(ctx, matrix, x, y)
+          if (matrix[y][x].match('^move(Left|Up)$')) startDrawing(ctx, matrix, x, y)
     }
   })
   const startDrawing = (ctx, matrix, x, y) => {
@@ -31,7 +31,7 @@
     '51,69,169,255':   'stop',
     '182,149,72,255':  'turnRight',
     '123,131,154,255': 'turnLeft'
-  }[rgba.join(',')] || '')
+  }[rgba.join(',')] || 'moveForward')
   const partition = (arr, chunk) => Array.from(Array(arr.length / chunk)).map((item, i) => arr.slice(i * chunk, (i + 1) * chunk))
   const getDirection = (direction, action) => ({
     'turnRight': direction % 4 + 1,
@@ -46,14 +46,17 @@
     4: {x: x - 1, y}
   }[direction])
   const draw = (ctx, matrix, {x, y}, oldDirection) => {
-    ctx.lineTo(x, y)
-    ctx.stroke()
     const action = matrix[y][x]
-    if (action === 'stop') {
-      ctx.closePath()
-    } else {
-      const newDirection = getDirection(oldDirection, action) || oldDirection
-      draw(ctx, matrix, nextPosition({x, y}, newDirection), newDirection)
+    const vectorEnd = !action.match('move')
+    if(vectorEnd) {
+      ctx.lineTo(x, y)
+      ctx.stroke()
+      if (action === 'stop') {
+        ctx.closePath()
+        return
+      }
     }
+    const newDirection = getDirection(oldDirection, action) || oldDirection
+    draw(ctx, matrix, nextPosition({x, y}, newDirection), newDirection)
   }
 </script>
