@@ -1,10 +1,10 @@
 <body>
 <script>
   Object.assign(new Image(), {
-    src: 'image.png',
+    src:    'image.png',
     onload: e => {
       const image = e.path[0]
-      const { width, height } = image
+      const {width, height} = image
       const ctx = getContext()
       ctx.drawImage(image, 0, 0)
       const pixels = partition(ctx.getImageData(0, 0, width, height).data, 4).map(rgbaToAction)
@@ -15,37 +15,37 @@
           if (matrix[y][x].startsWith('move')) startDrawing(ctx, matrix, x, y)
     }
   })
-  const startDrawing = (ctx, matrix, x,y) => {
+  const startDrawing = (ctx, matrix, x, y) => {
     ctx.beginPath()
     ctx.moveTo(x, y)
-    draw(ctx, matrix, { x, y })
+    draw(ctx, matrix, {x, y})
   }
   const getContext = () => {
     const canvas = document.createElement('canvas')
     document.body.appendChild(canvas)
-    return Object.assign(canvas.getContext('2d'), { strokeStyle: 'red', fillStyle: 'white', lineWidth: 2 })
+    return Object.assign(canvas.getContext('2d'), {strokeStyle: 'red', fillStyle: 'white', lineWidth: 2})
   }
   const rgbaToAction = rgba => ({
-    '7,84,19,255': 'moveUp',
-    '139,57,137,255': 'moveLeft',
-    '51,69,169,255': 'stop',
-    '182,149,72,255': 'turnRight',
+    '7,84,19,255':     'moveUp',
+    '139,57,137,255':  'moveLeft',
+    '51,69,169,255':   'stop',
+    '182,149,72,255':  'turnRight',
     '123,131,154,255': 'turnLeft'
   }[rgba.join(',')] || '')
   const partition = (arr, chunk) => Array.from(Array(arr.length / chunk)).map((item, i) => arr.slice(i * chunk, (i + 1) * chunk))
   const getDirection = (direction, action) => ({
-      'turnRight': direction % 4 + 1,
-      'turnLeft': (direction + 2) % 4 + 1 ,
-      'moveUp': 1,
-      'moveLeft': 4
-    }[action])
-  const nextPosition = ({ x, y }, direction) => ({
-    1: { x, y: y - 1 },
-    2: { x: x + 1, y },
-    3: { x, y: y + 1 },
-    4: { x: x - 1, y }
+    'turnRight': direction % 4 + 1,
+    'turnLeft':  (direction + 2) % 4 + 1,
+    'moveUp':    1,
+    'moveLeft':  4
+  }[action])
+  const nextPosition = ({x, y}, direction) => ({
+    1: {x, y: y - 1},
+    2: {x: x + 1, y},
+    3: {x, y: y + 1},
+    4: {x: x - 1, y}
   }[direction])
-  const draw = (ctx, matrix, { x, y }, oldDirection) => {
+  const draw = (ctx, matrix, {x, y}, oldDirection) => {
     ctx.lineTo(x, y)
     ctx.stroke()
     const action = matrix[y][x]
@@ -53,7 +53,7 @@
       ctx.closePath()
     } else {
       const newDirection = getDirection(oldDirection, action) || oldDirection
-      draw(ctx, matrix, nextPosition({ x, y }, newDirection), newDirection)
+      draw(ctx, matrix, nextPosition({x, y}, newDirection), newDirection)
     }
   }
 </script>
