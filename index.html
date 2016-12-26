@@ -52,9 +52,9 @@
     moveLeft:  4
   }[action])
   const nextPosition = ({x, y}, direction) => ({
-    1: {x, y: y - 1}, // UP
-    2: {x: x + 1, y}, // RIGHT
-    3: {x, y: y + 1}, // DOWN
-    4: {x: x - 1, y}  // LEFT
+    1: {x, y: y - 1}, // ↑
+    2: {x: x + 1, y}, // →
+    3: {x, y: y + 1}, // ↓
+    4: {x: x - 1, y}  // ←
   }[direction])
 </script>
