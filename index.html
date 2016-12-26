@@ -5,27 +5,27 @@
     onload: e => {
       const image = e.path[0]
       const {width, height} = image
-      const ctx = getContext()
+      const ctx = createContext()
       ctx.drawImage(image, 0, 0)
       const pixels = partition(ctx.getImageData(0, 0, width, height).data, 4).map(rgbaToAction)
       const matrix = partition(pixels, width)
       ctx.fillRect(0, 0, width, height)
       matrix.forEach((row, y) =>
         row.forEach((cell, x) =>
-          cell.match('^move(Left|Up)$') && startDrawing(ctx, matrix, x, y)))
+          cell.match('^move(Left|Up)$') && startVector(ctx, matrix, x, y)))
     }
   })
-  const getContext = () => {
+  const createContext = () => {
     const canvas = document.createElement('canvas')
     document.body.appendChild(canvas)
     return Object.assign(canvas.getContext('2d'), {strokeStyle: 'red', fillStyle: 'white', lineWidth: 2})
   }
-  const startDrawing = (ctx, matrix, x, y) => {
+  const startVector = (ctx, matrix, x, y) => {
     ctx.beginPath()
     ctx.moveTo(x, y)
-    draw(ctx, matrix, {x, y})
+    drawVector(ctx, matrix, {x, y})
   }
-  const draw = (ctx, matrix, {x, y}, oldDirection) => {
+  const drawVector = (ctx, matrix, {x, y}, oldDirection) => {
     const action = matrix[y][x]
     const vectorEnd = !action.match('move')
     if (vectorEnd) {
@@ -35,11 +35,11 @@
     if (action === 'stop') {
       ctx.closePath()
     } else {
-      const newDirection = getDirection(oldDirection, action) || oldDirection
-      draw(ctx, matrix, nextPosition({x, y}, newDirection), newDirection)
+      const direction = nextDirection(oldDirection, action) || oldDirection
+      drawVector(ctx, matrix, nextPosition({x, y}, direction), direction)
     }
   }
-  const partition = (arr, chunk) => Array.from(Array(arr.length / chunk)).map((item, i) => arr.slice(i * chunk, (i + 1) * chunk))
+  const partition = (arr, chunkSize) => Array.from(Array(arr.length / chunkSize)).map((_, i) => arr.slice(i * chunkSize, (i + 1) * chunkSize))
   const rgbaToAction = rgba => ({
     '7,84,19,255':     'moveUp',
     '139,57,137,255':  'moveLeft',
@@ -47,7 +47,7 @@
     '182,149,72,255':  'turnRight',
     '123,131,154,255': 'turnLeft'
   }[rgba.join(',')] || 'moveForward')
-  const getDirection = (direction, action) => ({
+  const nextDirection = (direction, action) => ({
     'turnRight': direction % 4 + 1,
     'turnLeft':  (direction + 2) % 4 + 1,
     'moveUp':    1,
