@@ -46,10 +46,10 @@
     '123,131,154,255': 'turnLeft'
   }[rgba.join(',')])
   const nextDirection = (direction, action) => ({
-    'turnRight': direction % 4 + 1,
-    'turnLeft':  (direction + 2) % 4 + 1,
-    'moveUp':    1,
-    'moveLeft':  4
+    turnRight: direction % 4 + 1,
+    turnLeft:  (direction + 2) % 4 + 1,
+    moveUp:    1,
+    moveLeft:  4
   }[action])
   const nextPosition = ({x, y}, direction) => ({
     1: {x, y: y - 1}, // UP
