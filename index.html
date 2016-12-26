@@ -2,8 +2,7 @@
 <script>
   Object.assign(new Image(), {
     src:    'image.png',
-    onload: e => {
-      const image = e.target || e.path[0]
+    onload: ({target: image}) => {
       const {width, height} = image
       const ctx = createContext()
       ctx.drawImage(image, 0, 0)
