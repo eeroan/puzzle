@@ -11,7 +11,7 @@
       ctx.fillRect(0, 0, width, height)
       matrix.forEach((row, y) =>
         row.forEach((cell, x) =>
-          cell.match('^move(Left|Up)$') && startVector(ctx, matrix, x, y)))
+          /^move(Left|Up)$/.test(cell) && startVector(ctx, matrix, x, y)))
     }
   })
   const createContext = () => {
@@ -26,8 +26,7 @@
   }
   const drawVector = (ctx, matrix, {x, y}, oldDirection) => {
     const action = matrix[y][x]
-    const vectorEnd = !action.match('move')
-    if (vectorEnd) {
+    if (/turn|stop/.test(action)) {
       ctx.lineTo(x, y)
       ctx.stroke()
     }
@@ -45,7 +44,7 @@
     '51,69,169,255':   'stop',
     '182,149,72,255':  'turnRight',
     '123,131,154,255': 'turnLeft'
-  }[rgba.join(',')] || 'moveForward')
+  }[rgba.join(',')])
   const nextDirection = (direction, action) => ({
     'turnRight': direction % 4 + 1,
     'turnLeft':  (direction + 2) % 4 + 1,
