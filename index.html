@@ -9,9 +9,7 @@
       const pixels = partition(ctx.getImageData(0, 0, width, height).data, 4).map(rgbaToAction)
       const matrix = partition(pixels, width)
       ctx.fillRect(0, 0, width, height)
-      matrix.forEach((row, y) =>
-        row.forEach((cell, x) =>
-          /move/.test(cell) && startVector(ctx, matrix, x, y)))
+      matrix.forEach((row, y) => row.forEach((cell, x) => /move/.test(cell) && startVector(ctx, matrix, x, y)))
     }
   })
   const createContext = () => {
@@ -26,18 +24,15 @@
   }
   const drawVector = (ctx, matrix, {x, y}, oldDirection) => {
     const action = matrix[y][x]
+    const direction = nextDirection(oldDirection, action)
     if (/turn|stop/.test(action)) {
       ctx.lineTo(x, y)
       ctx.stroke()
     }
-    if (action === 'stop') {
-      ctx.closePath()
-    } else {
-      const direction = nextDirection(oldDirection, action) || oldDirection
-      drawVector(ctx, matrix, nextPosition({x, y}, direction), direction)
-    }
+    if (action === 'stop') ctx.closePath()
+    else drawVector(ctx, matrix, nextPosition({x, y}, direction), direction)
   }
-  const partition = (arr, chunkSize) => Array.from(Array(arr.length / chunkSize)).map((_, i) => arr.slice(i * chunkSize, (i + 1) * chunkSize))
+  const partition = (arr, size) => Array.from(Array(arr.length / size)).map((_, i) => arr.slice(i * size, (i + 1) * size))
   const rgbaToAction = rgba => ({
     '7,84,19,255':     'moveUp',
     '139,57,137,255':  'moveLeft',
@@ -49,7 +44,8 @@
     turnRight: direction % 4 + 1,
     turnLeft:  (direction + 2) % 4 + 1,
     moveUp:    1,
-    moveLeft:  4
+    moveLeft:  4,
+    undefined: direction
   }[action])
   const nextPosition = ({x, y}, direction) => ({
     1: {x, y: y - 1}, // ↑
