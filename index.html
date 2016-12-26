@@ -9,7 +9,7 @@
       const pixels = partition(ctx.getImageData(0, 0, width, height).data, 4).map(rgbaToAction)
       const matrix = partition(pixels, width)
       ctx.fillRect(0, 0, width, height)
-      matrix.forEach((row, y) => row.forEach((cell, x) => /move/.test(cell) && startVector(ctx, matrix, x, y)))
+      matrix.forEach((row, y) => row.forEach((pixel, x) => /move/.test(pixel) && startVector(ctx, matrix, x, y)))
     }
   })
   const createContext = () => {
