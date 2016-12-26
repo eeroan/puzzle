@@ -48,15 +48,15 @@
   const draw = (ctx, matrix, {x, y}, oldDirection) => {
     const action = matrix[y][x]
     const vectorEnd = !action.match('move')
-    if(vectorEnd) {
+    if (vectorEnd) {
       ctx.lineTo(x, y)
       ctx.stroke()
-      if (action === 'stop') {
-        ctx.closePath()
-        return
-      }
     }
-    const newDirection = getDirection(oldDirection, action) || oldDirection
-    draw(ctx, matrix, nextPosition({x, y}, newDirection), newDirection)
+    if (action === 'stop') {
+      ctx.closePath()
+    } else {
+      const newDirection = getDirection(oldDirection, action) || oldDirection
+      draw(ctx, matrix, nextPosition({x, y}, newDirection), newDirection)
+    }
   }
 </script>
