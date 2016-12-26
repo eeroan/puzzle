@@ -11,7 +11,7 @@
       ctx.fillRect(0, 0, width, height)
       matrix.forEach((row, y) =>
         row.forEach((cell, x) =>
-          /^move(Left|Up)$/.test(cell) && startVector(ctx, matrix, x, y)))
+          /move/.test(cell) && startVector(ctx, matrix, x, y)))
     }
   })
   const createContext = () => {
